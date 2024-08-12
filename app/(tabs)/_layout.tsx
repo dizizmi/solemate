@@ -26,9 +26,45 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
+          title: 'Search',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+            <TabBarIcon name={focused ? 'search' : 'search-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="ballot"
+        options={{
+          title: 'Ballot',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'dice' : 'dice-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="cart"
+        options={{
+          title: 'Cart',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'cart' : 'cart-outline'} color={color} />
+          ),
+        }}
+      />
+       <Tabs.Screen
+        name="alerts"
+        options={{
+          title: 'Alerts',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'notifications' : 'notifications-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="account"
+        options={{
+          title: 'Account',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'person' : 'person-outline'} color={color} />
           ),
         }}
       />
