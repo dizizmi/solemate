@@ -50,15 +50,6 @@ export default function TabLayout() {
           ),
         }}
       />
-       <Tabs.Screen
-        name="alerts"
-        options={{
-          title: 'Alerts',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'notifications' : 'notifications-outline'} color={color} />
-          ),
-        }}
-      />
       <Tabs.Screen
         name="account"
         options={{
