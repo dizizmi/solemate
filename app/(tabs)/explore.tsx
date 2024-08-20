@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Image, Platform, ScrollView, View, Text, FlatList, ActivityIndicator} from 'react-native';
+import { StyleSheet, Image, Platform, ScrollView, View, Text, FlatList, ActivityIndicator, TouchableOpacity} from 'react-native';
 
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
@@ -87,20 +87,31 @@ const SearchScreen: React.FC = () => {
           <Text style={styles.text}>Sale</Text>
           <Text style={styles.text}>Features</Text>
         </ScrollView>
+      ) : products.length === 0 ? (
+        <View style={styles.noProductContainer}>
+          <Text style={styles.noProductText}>No shoes available</Text>
+        </View>
       ) : (
         <FlatList
           data={products}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View style={styles.productItem}>
-              <Text>{item.title}</Text>
-              {/* Render other properties as needed */}
-            </View>
+            <TouchableOpacity onPress={() => navigateToDetailPage(item.id)}>
+              <View style={styles.productItem}>
+                <Image source={{ uri: item.image }} style={styles.productImage} />
+                <Text style={styles.productTitle}>{item.title}</Text>
+                <Text style={styles.productPrice}>${item.base_price}</Text>
+              </View>
+            </TouchableOpacity>
           )}
         />
       )}
     </View>
   );
+};
+
+const navigateToDetailPage = (productId: string) => {
+  navigation.navigate('DetailedItem', { id: productId });
 };
 
 
@@ -132,6 +143,28 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ddd',
     borderBottomWidth: 1,
   },
+  productImage: {
+    width: 50, 
+    height: 50, 
+    marginRight: 16
+  },
+  productTitle: {
+    fontSize: 16
+  },
+  productPrice: { 
+    fontSize: 14, 
+    color: '#888' 
+  },
+  noProductContainer: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+  noProductText: { 
+    fontSize: 18, 
+    color: '#888' 
+  },
+
   container: {
     flex: 1,
     marginTop: 90,
