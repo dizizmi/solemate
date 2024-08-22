@@ -71,7 +71,8 @@ const HomeScreen: React.FC = () => {
         const response = await axios.request(options);
         setApiData(response.data);
         const responseFight = await axios.request(optionsFight);
-        setFightData(responseFight.data);
+        console.log('Fight Club Response:', responseFight.data); 
+        setFightData(responseFight.data.products);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
