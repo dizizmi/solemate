@@ -59,7 +59,7 @@ const HomeScreen: React.FC = () => {
     const optionsFight = {
       method: 'GET',
       url: 'https://sneaker-database-stockx.p.rapidapi.com/fightclub-releases',
-      params: {hitsPerPage: '4'},
+      params: {hitsPerPage: '6'},
       headers: {
         'x-rapidapi-key': 'f207a35fcfmsh575e1cc770e9063p1e6dd6jsn4bf91b482db1',
         'x-rapidapi-host': 'sneaker-database-stockx.p.rapidapi.com'
@@ -71,7 +71,7 @@ const HomeScreen: React.FC = () => {
         const response = await axios.request(options);
         setApiData(response.data);
         const responseFight = await axios.request(optionsFight);
-        console.log('Fight Club Response:', responseFight.data); 
+  
         setFightData(responseFight.data.products);
       } catch (error) {
         console.error('Error fetching data:', error);
