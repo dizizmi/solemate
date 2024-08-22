@@ -1,140 +1,136 @@
 import { ScrollView, View, Text, Image, TouchableOpacity, StyleSheet, Platform, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { useNavigation } from '@react-navigation/native';
+
 import { StackNavigationProp } from '@react-navigation/stack';
 
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
-import { RootStackParamList } from '@/components/stack';
+//import { RootStackParamList } from '@/components/stack';
 
-type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
+import axios from 'axios';
 
-type Product = {
-  id: string;
-  title: string;
-  category: string;
-  base_price: string;
-  image: string;
+//type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
+
+type Latest = {
+  _id: string;
+  shoeName: string;
   brand: string;
-  //below isnt in the api
-  model: string;
-  color: string;
+  retailPrice: number;
+  colorway: string;
+  thumbnail: string;
+  releaseDate: string;
+  description: string;
 };
 
-type latestRelease = {
-  id: string;
-  title: string;
+type Fight = {
+  product_template_id: number;
+  brand_name: string;
   color: string;
-  price: string;
-  image: string;
-};
+  details: string;
+  main_glow_picture_url: string;
+  name: string;
+  single_gender: string;
+  release_year: number;
+  story: string;
+  retail_price_cents_usd: number;
 
-const HomeScreen = ({ }) => {
-  const navigation = useNavigation<HomeScreenNavigationProp>();
-  // const [products, setProducts] = useState<Product[]>([]);
-  // const [loading, setLoading] = useState<boolean>(true);
-  // const [error, setError] = useState<string | null>(null);
-  // const navigation = useNavigation();
-
-  // useEffect(() => {
-  //   const fetchProducts = async () => {
-  //     try {
-  //       const response = await axios.get('https://stockx-api.p.rapidapi.com/product/01c1af38-d1d0-462c-aca3-13349dc893a9');
-        
-  //       // Mapping the response to match the Product type
-  //       const fetchedProducts: Product[] = response.data.map((item: any) => ({
-  //         id: item.id,
-  //         title: item.title,
-  //         category: item.category,
-  //         base_price: `${item.currency} ${item.base_price}`, // Concatenate currency and price
-  //         image: item.image,
-  //         brand: item.brand,
-  //       }));
-        
-  //       setProducts(fetchedProducts);
-  //     } catch (error) {
-  //       setError('Failed to load products');
-  //       console.error(error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchProducts();
-  // }, []);
-
-  // if (loading) {
-  //     return (
-  //         <View style={styles.loaderContainer}>
-  //             <ActivityIndicator size="large" color="#0000ff" />
-  //         </View>
-  //     );
-  // }
-
-  // if (error) {
-  //     return (
-  //         <View style={styles.errorContainer}>
-  //             <Text style={styles.errorText}>{error}</Text>
-  //         </View>
-  //     );
-  // }
-
+}
+const HomeScreen: React.FC = () => {
   
+
+  const [apiData, setApiData] = useState<Latest[] | null>(null);
+  const [fightData, setFightData] = useState<Fight[] | null>(null);
+  const defaultImage = 'https://via.placeholder.com/150'; // Default image URL
+
+  useEffect(() => {
+    const options = {
+      method: 'GET',
+      url: 'https://sneaker-database-stockx.p.rapidapi.com/mostpopular',
+      params: {limit: '10'},
+      headers: {
+        'x-rapidapi-key': 'f207a35fcfmsh575e1cc770e9063p1e6dd6jsn4bf91b482db1',
+        'x-rapidapi-host': 'sneaker-database-stockx.p.rapidapi.com'
+      }
+    };
+
+    const optionsFight = {
+      method: 'GET',
+      url: 'https://sneaker-database-stockx.p.rapidapi.com/fightclub-releases',
+      params: {hitsPerPage: '4'},
+      headers: {
+        'x-rapidapi-key': 'f207a35fcfmsh575e1cc770e9063p1e6dd6jsn4bf91b482db1',
+        'x-rapidapi-host': 'sneaker-database-stockx.p.rapidapi.com'
+      }
+    };
+    
+    const fetchData = async () => {
+      try {
+        const response = await axios.request(options);
+        setApiData(response.data);
+        const responseFight = await axios.request(optionsFight);
+        setFightData(responseFight.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const Products: React.FC<{ products: Latest[] }> = ({ products }) => (
+    <ScrollView horizontal>
+      {products.map((product) => (
+          <View key={product._id} style={styles.card}>
+            <Text style={styles.productBrand}>{product.releaseDate}</Text>
+            <Image
+              source={{ uri: product.thumbnail || defaultImage }}
+              style={styles.image}
+            />
+            <View style={styles.productInfo}>
+              <Text style={styles.productTitle}>{product.brand}</Text>
+              <Text style={styles.productBrand} numberOfLines={1} >{product.shoeName}</Text>
+              <Text style={styles.productColor} numberOfLines={1}>{product.colorway}</Text>
+              <Text style={styles.productPrice}>${product.retailPrice}</Text>
+          </View>
+        </View>
+      
+      ))}
+    </ScrollView>
+  );
+
+  const Fights: React.FC<{ fights: Fight[] }> = ({ fights }) => (
+    <ScrollView horizontal>
+      {Array.isArray(fights) && fights.length > 0 ? (
+        fights.map((fight, index) => (
+          <View key={index} style={styles.card}>
+            <Text style={styles.productBrand}>{fight.release_year}</Text>
+            <Image
+              source={{ uri: fight.main_glow_picture_url || defaultImage }}
+              style={styles.image}
+            />
+            <View style={styles.productInfo}>
+              <Text style={styles.productTitle}>{fight.brand_name}</Text>
+              <Text style={styles.productBrand} numberOfLines={1}>
+                {fight.name}
+              </Text>
+              <Text style={styles.productColor} numberOfLines={1}>
+                {fight.color}
+              </Text>
+              <Text style={styles.productPrice}>
+                ${fight.retail_price_cents_usd / 100}
+              </Text>
+            </View>
+          </View>
+        ))
+      ) : (
+        <Text>No fight club releases available</Text>
+      )}
+    </ScrollView>
+  );
   
-  const products: Product[] = [
-    {
-      title: 'Air Jordan', model: '1 High OG C', color: 'Red, Black & White', base_price: '$250', image: 'https://via.placeholder.com/150',
-      id: '',
-      category: '',
-      brand: ''
-    },
-    {
-      title: 'Nike', model: 'Air Max 34', color: 'White', base_price: '$135', image: 'https://via.placeholder.com/150',
-      id: '',
-      category: '',
-      brand: ''
-    },
-    {
-      title: 'Nike', model: 'Air Force 1', color: 'White', base_price: '$89', image: 'https://via.placeholder.com/150',
-      id: '',
-      category: '',
-      brand: ''
-    },
-    {
-      title: 'Salomon', model: 'XT-6', color: 'Salmon', base_price: '$260', image: 'https://via.placeholder.com/150',
-      id: '',
-      category: '',
-      brand: ''
-    },
-    {
-      title: 'New Balance', model: '550', color: 'Black & White', base_price: '$180', image: 'https://via.placeholder.com/150',
-      id: '',
-      category: '',
-      brand: ''
-    },
-    {
-      title: 'Asics', model: 'Gel Lyte III', color: 'Green & White', base_price: '$110', image: 'https://via.placeholder.com/150',
-      id: '',
-      category: '',
-      brand: ''
-    },
-];
-
-  const latestRelease = [
-    { id: '4', title: 'Air Jordan 1 High', color: 'Red, Black & White', price: '$200', image: 'https://via.placeholder.com/150' },
-    { id: '5',title: 'Nike Air Max 34', color: 'White', price: '$195', image: 'https://via.placeholder.com/150' },
-    { id: '6', title: 'Nike Air Force 1', color: 'White', price: '$100', image: 'https://via.placeholder.com/150' },
-  ];
-
-  const collabs = [
-    { id: '7', name: 'MSCF x Lil Nas', color: 'Red, Black & White', price: '$859', rating: 4.5, image: 'https://via.placeholder.com/150' },
-    { id: '8', name: 'Carhartt x Conv', color: 'Tan', price: '$195', rating: 4.3, image: 'https://via.placeholder.com/150' },
-    { id: '9', name: 'Raf Sim x Adidas', color: 'Cool Gel', price: '$265', rating: 4.8, image: 'https://via.placeholder.com/150' },
-  ];
-
 
   return (
     <ParallaxScrollView
@@ -144,64 +140,49 @@ const HomeScreen = ({ }) => {
                 source={require('@/assets/images/header.png')}
                 style={styles.headerImage}
             />
-        }
-      >
-        <ThemedView style={styles.titleContainer}>
-            <ThemedText type="title">Products</ThemedText>
-        </ThemedView>
+          }
+        >
 
+      <ThemedView style={styles.productContainer}>
+        <ThemedText type="title">Latest Release
+        </ThemedText>
+      </ThemedView>
+      
         <ThemedView style={styles.productContainer}>
-                <ScrollView>
-                    {products.map((product, index) => (
-                        <View key={index} style={styles.productItem}>
-                            <Image source={{ uri: product.image }} style={styles.productImage} />
-                            <View style={styles.productInfo}>
-                                <Text style={styles.productTitle}>{product.title}</Text>
-                                <Text style={styles.productModel}>{product.model}</Text>
-                                <Text style={styles.productColor}>{product.color}</Text>
-                                <Text style={styles.productPrice}>{product.base_price}</Text>
-                            </View>
-                            <Text style={styles.arrow}>{'>'}</Text>
-                        </View>
-                    ))}
-                </ScrollView>
-            </ThemedView>
-     
-
-        <ThemedView style={styles.productContainer}>
-          <ThemedText type="title">Latest Release</ThemedText>
+          <ThemedText type="subtitle">StockX</ThemedText>
           <ScrollView horizontal>
-          {latestRelease.map((item) => (
-            <TouchableOpacity key={item.id} onPress={() => navigation.navigate('Detail', { id: item.id })}>
-              <View style={styles.card}>
-                <Image source={{ uri: item.image }} style={styles.image} />
-                <Text>{item.title}</Text>
-                <Text>{item.color}</Text>
-                <Text>{item.price}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
+              <TouchableOpacity >
+                {apiData ? (
+                  <Products products={apiData} />
+                ) : (
+                  <Text>Loading...</Text>
+                )}
+              </TouchableOpacity>
+          
         </ScrollView>
-        </ThemedView>
+        </ThemedView> 
+
+      <ThemedView style={styles.productContainer}>
+        <ThemedText type="subtitle">FightClub </ThemedText>
 
         <ThemedView style={styles.productContainer}>
-          <ThemedText type="title">Collabs</ThemedText>
-          <ScrollView horizontal>
-          {collabs.map((item) => (
-            <TouchableOpacity key={item.id} onPress={() => navigation.navigate('Detail', { id: item.id })}>
-              <View style={styles.card}>
-                <Image source={{ uri: item.image }} style={styles.image} />
-                <Text>{item.name}</Text>
-                <Text>{item.color}</Text>
-                <Text>Rating: {item.rating} ★</Text>
-                <Text>{item.price}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+            <ScrollView horizontal>
+                <TouchableOpacity >
+                  {fightData ? (
+                    <Fights fights={fightData} />
+                  ) : (
+                    <Text>Loading...</Text>
+                  )}  
+                
+                </TouchableOpacity>
+            </ScrollView>
         </ThemedView>
+      </ThemedView>
 
+    
     </ParallaxScrollView>
+
+
 );
 };
 
@@ -210,26 +191,9 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
   },
-
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  title: {
+    fontSize: 10,
   },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 16,
-  },
-
-  titleContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-},
-
   productContainer: {
     padding: 2
   },
@@ -313,3 +277,44 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
+
+
+
+{/* <ThemedView style={styles.titleContainer}>
+            <ThemedText type="title">Products</ThemedText>
+        </ThemedView>
+
+        {/* <ThemedView style={styles.productContainer}>
+                <ScrollView>
+                    {products.map((product, index) => (
+                        <View key={index} style={styles.productItem}>
+                            <Image source={{ uri: product.image }} style={styles.productImage} />
+                            <View style={styles.productInfo}>
+                                <Text style={styles.productTitle}>{product.title}</Text>
+                                <Text style={styles.productModel}>{product.model}</Text>
+                                <Text style={styles.productColor}>{product.color}</Text>
+                                <Text style={styles.productPrice}>{product.base_price}</Text>
+                            </View>
+                            <Text style={styles.arrow}>{'>'}</Text>
+                        </View>
+                    ))}
+                </ScrollView>
+            </ThemedView> */}
+     
+
+             {/* <ThemedView style={styles.productContainer}>
+          <ThemedText type="title">Collabs</ThemedText>
+          <ScrollView horizontal>
+          {collabs.map((item) => (
+            <TouchableOpacity key={item.id} onPress={() => navigation.navigate('Detail', { id: item.id })}>
+              <View style={styles.card}>
+                <Image source={{ uri: item.image }} style={styles.image} />
+                <Text>{item.name}</Text>
+                <Text>{item.color}</Text>
+                <Text>Rating: {item.rating} ★</Text>
+                <Text>{item.price}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        </ThemedView> */}
