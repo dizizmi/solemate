@@ -1,7 +1,8 @@
 import { ScrollView, View, Text, Image, TouchableOpacity, StyleSheet, Platform, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { useNavigation } from '@react-navigation/native';
+import { Link } from 'expo-router'
+
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
@@ -13,99 +14,97 @@ type Product = {
   id: string;
   title: string;
   category: string;
-  base_price: string;
+  base_price: number;
   image: string;
   brand: string;
   //below isnt in the api
   model: string;
   color: string;
+  gender: string;
 };
 
 const BallotScreen: React.FC = () => {
-  
-  const products: Product[] = [
-    {
-      title: 'Air Jordan', model: '1 High OG C', color: 'Red, Black & White', base_price: '$250', image: 'https://via.placeholder.com/150',
-      id: '',
-      category: '',
-      brand: ''
-    },
-    {
-      title: 'Nike', model: 'Air Max 34', color: 'White', base_price: '$135', image: 'https://via.placeholder.com/150',
-      id: '',
-      category: '',
-      brand: ''
-    },
-    {
-      title: 'Nike', model: 'Air Force 1', color: 'White', base_price: '$89', image: 'https://via.placeholder.com/150',
-      id: '',
-      category: '',
-      brand: ''
-    },
-    {
-      title: 'Salomon', model: 'XT-6', color: 'Salmon', base_price: '$260', image: 'https://via.placeholder.com/150',
-      id: '',
-      category: '',
-      brand: ''
-    },
-    {
-      title: 'New Balance', model: '550', color: 'Black & White', base_price: '$180', image: 'https://via.placeholder.com/150',
-      id: '',
-      category: '',
-      brand: ''
-    },
-    {
-      title: 'Asics', model: 'Gel Lyte III', color: 'Green & White', base_price: '$110', image: 'https://via.placeholder.com/150',
-      id: '',
-      category: '',
-      brand: ''
-    },
-];
+
+  const [apiData, setApiData] = useState<Product[] | null>(null);
+  const defaultImage = 'https://via.placeholder.com/150'; // Default image URL
+
+  useEffect(() => {
+    const options = {
+      method: 'GET',
+      url: 'https://stockx-api.p.rapidapi.com/product/01c1af38-d1d0-462c-aca3-13349dc893a9',
+      headers: {
+        'x-rapidapi-key': 'f207a35fcfmsh575e1cc770e9063p1e6dd6jsn4bf91b482db1',
+        'x-rapidapi-host': 'stockx-api.p.rapidapi.com'
+      }
+    };
+    
+    const fetchData = async () => {
+      try {
+        const response = await axios.request(options);
+        setApiData([response.data]);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
+  const Products: React.FC<{ products: Product[] }> = ({ products }) => (
+    <ScrollView>
+        {products.map((product) => (
+          <View key={product.id} style= {styles.productItem}>
+              <Image source={{ uri: product.image }} style={styles.productImage} />
+              <View style={styles.productInfo}>
+                  <ThemedText style={styles.productBrand}>{product.brand}</ThemedText>
+                  <ThemedText style={styles.productTitle}>{product.title}</ThemedText>
+                  <ThemedText style={styles.productGender}>{product.gender}</ThemedText>
+                  <ThemedText style={styles.productPrice}>${product.base_price}</ThemedText>
+                  </View>
+            </View>
+       
+      ))}
+      </ScrollView>
+  );
+
 
   return (
     <ParallaxScrollView
-        headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-        headerImage={
-            <Image
-                source={require('@/assets/images/header.jpeg')}
-                style={styles.headerImage}
-            />
-        }
-      >
-        <ThemedView style={styles.titleContainer}>
-            <ThemedText type="title" style={styles.title}>Upcoming ballots</ThemedText>
+      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+      headerImage={
+        <Image
+          source={require('@/assets/images/header.jpeg')}
+          style={styles.headerImage}
+        />
+      }
+    >
+    
+      <ThemedView style={styles.titleContainer}>
+        <ThemedText type="title">Ballot</ThemedText>
+      </ThemedView>
 
-        </ThemedView>
+      <ThemedView style={styles.productContainer}>
+        
+        <TouchableOpacity >
+          {apiData ? (
+            <Products products={apiData} />
+          ) : (
+            <Text>Loading...</Text>
+          )}
+        </TouchableOpacity>
+       
+      </ThemedView>
 
-        <ThemedView style={styles.productContainer}>
-                <ScrollView>
-                    {products.map((product, index) => (
-                        <View key={index} style={styles.productItem}>
-                            <Image source={{ uri: product.image }} style={styles.productImage} />
-                            <View style={styles.productInfo}>
-                                <Text style={styles.productTitle}>{product.title}</Text>
-                                <Text style={styles.productModel}>{product.model}</Text>
-                                <Text style={styles.productColor}>{product.color}</Text>
-                                <Text style={styles.productPrice}>{product.base_price}</Text>
-                            </View>
-                            <Text style={styles.arrow}>{'>'}</Text>
-                        </View>
-                    ))}
-                </ScrollView>
-            </ThemedView>
-     
 
-        <ThemedView style={styles.productContainer}>
-          <ThemedText type="title">Popular</ThemedText>
-        </ThemedView>
-
-        <ThemedView style={styles.productContainer}>
-          <ThemedText type="title">Trending</ThemedText>
-        </ThemedView>
+      <ThemedView style={styles.productContainer}>
+        <ThemedText type="title">Trending</ThemedText>
+      </ThemedView>
 
     </ParallaxScrollView>
-);
+  );
 };
+
 
 const styles = StyleSheet.create({
   headerImage: {
@@ -131,23 +130,29 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
 },
-title: {
-  fontSize: 20,
+  title: {
+    fontSize: 20,
 },
 
   productContainer: {
     padding: 5,
+    
   },
   productItem: {
     flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: '#fff',
+    alignItems: 'center',
     padding: 10,
     marginBottom: 12,
     borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+
 },
   productImage: {
-    width: 60,
+    width: 100,
     height: 60,
     marginRight: 16,
     borderRadius: 4,
@@ -155,19 +160,21 @@ title: {
   productInfo: {
     flexGrow: 1,
   },
-  productTitle: {
-    fontSize: 16,
+  productBrand: {
+    fontSize: 14,
     fontWeight: 'bold',
-    marginBottom: 4,
+
   },
   productCategory: {
     fontSize: 14,
     color: '#666',
   },
-  productBrand: {
+  productTitle: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 4,
+    marginRight: 100,
+    paddingRight: 10,
+
   },
   productPrice: {
     fontSize: 16,
@@ -178,10 +185,10 @@ title: {
     fontSize: 14,
     color: '#666',
 },
-  productColor: {
-    fontSize: 12,
+  productGender: {
+    fontSize: 14,
     color: '#aaa',
-    marginBottom: 4,
+    
 },
 
   arrow: {
