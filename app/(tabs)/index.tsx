@@ -2,13 +2,14 @@ import { ScrollView, View, Text, Image, TouchableOpacity, StyleSheet, Platform, 
 import React, { useEffect, useState } from 'react';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 
-import { StackNavigationProp } from '@react-navigation/stack';
-
+import { useNavigation } from '@react-navigation/native';
+import { HomeTabScreenProps } from '@/components/navigation/stack';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
 //import { RootStackParamList } from '@/components/stack';
+
 
 import axios from 'axios';
 
@@ -36,14 +37,24 @@ type Fight = {
   release_year: number;
   story: string;
   retail_price_cents_usd: number;
+  //additional for detailed page
+  size_us_men: number | null;
+  size_us_women: number | null;
+  size_us_youth: number | null;
+ 
+  lowest_price_cents_usd: number;
+  story_html: string;
 
 }
 const HomeScreen: React.FC = () => {
-  
+
 
   const [apiData, setApiData] = useState<Latest[] | null>(null);
   const [fightData, setFightData] = useState<Fight[] | null>(null);
-  const defaultImage = 'https://via.placeholder.com/150'; // Default image URL
+  const defaultImage = 'https://via.placeholder.com/150'; // Default image URL  
+
+  // navigation to detailed page
+  const navigation = useNavigation<HomeTabScreenProps<'DetailedItem'>['navigation']>();
 
   useEffect(() => {
     const options = {
@@ -84,6 +95,11 @@ const HomeScreen: React.FC = () => {
   const Products: React.FC<{ products: Latest[] }> = ({ products }) => (
     <ScrollView horizontal>
       {products.map((product) => (
+        <TouchableOpacity 
+        //navigation to LatestRelease StockX shoes
+          key = {product._id}
+          onPress={() => navigation.navigate('DetailedItem', { id: product._id})}
+        >
           <View key={product._id} style={styles.card}>
             <Text style={styles.productBrand}>{product.releaseDate}</Text>
             <Image
@@ -97,15 +113,23 @@ const HomeScreen: React.FC = () => {
               <Text style={styles.productPrice}>${product.retailPrice}</Text>
           </View>
         </View>
-      
+        </TouchableOpacity>
       ))}
     </ScrollView>
   );
 
   const Fights: React.FC<{ fights: Fight[] }> = ({ fights }) => (
     <ScrollView horizontal>
-      {Array.isArray(fights) && fights.length > 0 ? (
+      {Array.isArray(fights) && fights.length > 0 ? ( // Check if the array is not empty for this API
         fights.map((fight, index) => (
+          <TouchableOpacity
+          //navigation to detailed LatestRelease Fight shoes
+          key = {index}
+          onPress={() => navigation.navigate('DetailedItem', 
+            { screen: 'DetailedItem' , 
+              params: {id: String(fight.product_template_id)}
+              })
+            }>
           <View key={index} style={styles.card}>
             <Text style={styles.productBrand}>{fight.release_year}</Text>
             <Image
@@ -125,10 +149,12 @@ const HomeScreen: React.FC = () => {
               </Text>
             </View>
           </View>
+          </TouchableOpacity>
         ))
       ) : (
         <Text>No fight club releases available</Text>
       )}
+    
     </ScrollView>
   );
   
@@ -152,7 +178,7 @@ const HomeScreen: React.FC = () => {
         <ThemedView style={styles.productContainer}>
           <ThemedText type="subtitle">StockX</ThemedText>
           <ScrollView horizontal>
-              <TouchableOpacity >
+            <TouchableOpacity >
                 {apiData ? (
                   <Products products={apiData} />
                 ) : (
@@ -168,14 +194,14 @@ const HomeScreen: React.FC = () => {
 
         <ThemedView style={styles.productContainer}>
             <ScrollView horizontal>
-                <TouchableOpacity >
+                
                   {fightData ? (
                     <Fights fights={fightData} />
                   ) : (
                     <Text>Loading...</Text>
                   )}  
                 
-                </TouchableOpacity>
+              
             </ScrollView>
         </ThemedView>
       </ThemedView>
