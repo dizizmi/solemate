@@ -1,6 +1,6 @@
 // SearchBar.tsx
-import React from 'react';
-import { View, TextInput, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, TextInput, StyleSheet, Text } from 'react-native';
 
 type SearchBarProps = {
   placeholder?: string;
@@ -10,15 +10,29 @@ type SearchBarProps = {
 
 
 const SearchBar: React.FC<SearchBarProps> = ({ placeholder = 'Search', onSearch }) => {
+  const [inputValue, setInputValue] = useState('');
+
+  const handleInputChange = (text: string) => {
+    setInputValue(text);
+  
+  };
+
+  const handleSearchSubmit = () => {
+    onSearch(inputValue);
+  };
+  
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder={placeholder}
-        placeholderTextColor="#707070"
-        onChangeText={onSearch}
-      />
-    </View>
+    <TextInput
+      style={styles.input}
+      placeholder={placeholder}
+      placeholderTextColor="#707070"
+      value={inputValue}
+      onChangeText={handleInputChange}
+      onSubmitEditing={handleSearchSubmit} // Trigger search on "Enter" key press
+      returnKeyType="search" // Shows "Search" on the keyboard's "Enter" key
+    />
+  </View>
   );
 };
 
@@ -35,6 +49,11 @@ const styles = StyleSheet.create({
   },
   input: {
     fontSize: 16,
+    color: '#000',
+  },
+  displayText: {
+    marginTop: 8,
+    fontSize: 14,
     color: '#000',
   },
 });
