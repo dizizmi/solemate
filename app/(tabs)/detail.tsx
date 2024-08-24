@@ -24,6 +24,8 @@ type selectedSize = {
   lowest_price_cents_usd: number;
   story_html: string;
   has_stock: boolean;
+  shoe_condition: string;
+  instant_ship_lowest_price_cents_usd: number;
 };
 
 type SizeOption = {
@@ -88,9 +90,9 @@ const DetailedItem = ({ navigation, route }: HomeTabScreenProps<'DetailedItem'>)
     { value: 'US 11', label: 'US 11', available: fetchedData.size_us_men === 11 && fetchedData.has_stock },
   ];
 
-  
 
-  return (
+
+return (
     
     <ScrollView>
     <View style={styles.container}>
@@ -98,7 +100,7 @@ const DetailedItem = ({ navigation, route }: HomeTabScreenProps<'DetailedItem'>)
         <View style={styles.productHeader}>
         
           <Text style={styles.productHeaderTitle}>{fetchedData.release_year}  {fetchedData.name}</Text>
-
+          
         </View>
           <Text style={styles.productPrice}>
             ${fetchedData.retail_price_cents_usd / 100}
@@ -106,7 +108,9 @@ const DetailedItem = ({ navigation, route }: HomeTabScreenProps<'DetailedItem'>)
             <Ionicons name="arrow-down-outline" size={25} color="red" />
             ${fetchedData.lowest_price_cents_usd / 100}
           </Text>
+          
         </Text>
+        
      
         <View style={styles.productImageContainer}>
           <Image
@@ -117,7 +121,8 @@ const DetailedItem = ({ navigation, route }: HomeTabScreenProps<'DetailedItem'>)
         </View>
 
         <View style={styles.productSizes}>
-          <Text style={styles.sizeLabel}>SIZE:</Text>
+          <Text>{fetchedData.single_gender}</Text>
+          <Text style={styles.sizeLabel}>SIZE: </Text>
           <View style={styles.sizeOptions}>
             {sizes.map((size) => (
               <TouchableOpacity
@@ -143,13 +148,15 @@ const DetailedItem = ({ navigation, route }: HomeTabScreenProps<'DetailedItem'>)
 
         <View style={styles.productDescription}>
           <ThemedText>{fetchedData.story_html}</ThemedText>
-          <Text>{}</Text>
+          <Text>Condition: {fetchedData.shoe_condition}</Text>
+          <Text>Details: {fetchedData.details}</Text>
         </View>
 
         <View style={styles.productActions}>
-          <TouchableOpacity style={styles.quickCheckout}>
+        <TouchableOpacity style={styles.quickCheckout} >
             <Text>Quick check out</Text>
-          </TouchableOpacity>
+        </TouchableOpacity>
+
           <TouchableOpacity style={styles.wishlist}>
           <Ionicons name="heart-outline" size={24} color="#5139FF" />
           </TouchableOpacity>
@@ -200,14 +207,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center', // Centering image horizontally
     marginBottom: 5,
-
-   
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    borderRadius: 8,
+    
   },
 
   productImage: {
     width: 300,
     height: 300, // Fixed height to maintain aspect ratio
     resizeMode: 'contain', // Ensure the image scales properly
+    borderRadius: 4,
   },
 
   productSizes: {
@@ -285,9 +297,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
     color: '#fff',
-
-
+    borderRadius: 8,
   },
+
+  disabledButton: {
+    backgroundColor: '#ccc',
+  },  
 
   wishlist: {
     padding: 10,
@@ -295,6 +310,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     backgroundColor: '#fff',
     borderColor: '#ccc',
+    borderRadius: 8,
     borderWidth: 1,
     justifyContent: 'center',
     alignItems: 'center',
