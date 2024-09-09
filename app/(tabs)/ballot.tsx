@@ -1,7 +1,10 @@
-import { ScrollView, View, Text, Image, TouchableOpacity, StyleSheet, Platform, ActivityIndicator } from 'react-native';
+import { ScrollView, View, Text, Image, TouchableOpacity, StyleSheet, Platform, ActivityIndicator, Button } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { Link } from 'expo-router'
+import { Link } from 'expo-router';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -23,9 +26,20 @@ type Product = {
   gender: string;
 };
 
-const BallotScreen: React.FC = () => {
+type Trend = {
+  _id: string;
+  shoeName: string;
+  thumbnail: string;
+  brand: string;
+  retailPrice: number;
+
+}
+
+const BallotScreen: React.FC = ({ navigation }) => {
 
   const [apiData, setApiData] = useState<Product[] | null>(null);
+  const [trendData, setTrendData] = useState<Trend[] | null>(null);
+  
   const defaultImage = 'https://via.placeholder.com/150'; // Default image URL
 
   useEffect(() => {
@@ -37,11 +51,23 @@ const BallotScreen: React.FC = () => {
         'x-rapidapi-host': 'stockx-api.p.rapidapi.com'
       }
     };
+
+    const optionsPop = {
+      method: 'GET',
+      url: 'https://sneaker-database-stockx.p.rapidapi.com/mostpopular',
+      params: {limit: '15'},
+      headers: {
+        'x-rapidapi-key': 'f207a35fcfmsh575e1cc770e9063p1e6dd6jsn4bf91b482db1',
+        'x-rapidapi-host': 'sneaker-database-stockx.p.rapidapi.com'
+      }
+    };
     
     const fetchData = async () => {
       try {
         const response = await axios.request(options);
         setApiData([response.data]);
+        const responsePop = await axios.request(optionsPop);
+        setTrendData(responsePop.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -49,6 +75,7 @@ const BallotScreen: React.FC = () => {
 
     fetchData();
   }, []);
+  
 
 
   const Products: React.FC<{ products: Product[] }> = ({ products }) => (
@@ -61,6 +88,22 @@ const BallotScreen: React.FC = () => {
                   <ThemedText style={styles.productTitle}>{product.title}</ThemedText>
                   <ThemedText style={styles.productGender}>{product.gender}</ThemedText>
                   <ThemedText style={styles.productPrice}>${product.base_price}</ThemedText>
+                  </View>
+            </View>
+       
+      ))}
+      </ScrollView>
+  );
+
+  const Trend: React.FC<{ product: Trend[] }> = ({ product }) => (
+    <ScrollView>
+        {product.map((item) => (
+          <View key={item._id} style= {styles.productItem}>
+              <Image source={{ uri: item.thumbnail }} style={styles.productImage} />
+              <View style={styles.productInfo}>
+                  <ThemedText style={styles.productBrand}>{item.brand}</ThemedText>
+                  <ThemedText style={styles.productTitle}>{item.shoeName}</ThemedText>
+                  <ThemedText style={styles.productPrice}>${item.retailPrice}</ThemedText>
                   </View>
             </View>
        
@@ -82,6 +125,11 @@ const BallotScreen: React.FC = () => {
     
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Ballot</ThemedText>
+        <Button 
+          title="See More"
+          onPress={() => navigation.navigate('DetailedItem')}
+          
+          ></Button>
       </ThemedView>
 
       <ThemedView style={styles.productContainer}>
@@ -99,6 +147,17 @@ const BallotScreen: React.FC = () => {
 
       <ThemedView style={styles.productContainer}>
         <ThemedText type="title">Trending</ThemedText>
+      </ThemedView>
+      <ThemedView style={styles.productContainer}>
+        
+        <TouchableOpacity >
+          {trendData ? (
+            <Trend product={trendData} />
+          ) : (
+            <Text>Loading...</Text>
+          )}
+        </TouchableOpacity>
+       
       </ThemedView>
 
     </ParallaxScrollView>
