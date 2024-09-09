@@ -1,7 +1,7 @@
 import { ThemedText } from '@/components/ThemedText';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Image, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, View, Image, Text, TouchableOpacity, ScrollView, Modal} from 'react-native';
 import type { HomeTabScreenProps } from '@/components/navigation/stack';
 
 import axios from 'axios';
@@ -34,14 +34,11 @@ type SizeOption = {
   available: boolean;
 };
 
-
-
-
 const DetailedItem = ({ navigation, route }: HomeTabScreenProps<'DetailedItem'>) => {
   
-
   const [fetchedData, setFetchedData] = useState<selectedSize | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
   
   useEffect(() => {
 
@@ -74,6 +71,10 @@ const DetailedItem = ({ navigation, route }: HomeTabScreenProps<'DetailedItem'>)
   if (!fetchedData) {
     return <Text>Loading...</Text>;
   }
+
+  const handleQuickCheckout = () => {
+    setModalVisible(true); // Show the modal when Quick Checkout is clicked
+  };
 
   const sizes: SizeOption[] = [
     { value: 'US 4', label: 'US 4', available: fetchedData.size_us_men === 4 && fetchedData.has_stock },
@@ -153,14 +154,41 @@ return (
         </View>
 
         <View style={styles.productActions}>
-        <TouchableOpacity style={styles.quickCheckout} >
-            <Text>Quick check out</Text>
+        <TouchableOpacity style={styles.quickCheckout} onPress={handleQuickCheckout} >
+            <Text style={styles.checkoutText}>Quick check out</Text>
         </TouchableOpacity>
 
           <TouchableOpacity style={styles.wishlist}>
           <Ionicons name="heart-outline" size={24} color="#5139FF" />
           </TouchableOpacity>
         </View>
+
+        <Modal
+          transparent={true}
+          visible={modalVisible}
+          animationType="fade"
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
+                <Text style={styles.closeButtonText}>X</Text>
+              </TouchableOpacity>
+
+              <Text style={styles.modalTitle}>Added to cart!</Text>
+              <Text style={styles.modalSubtitle}>Check alerts for any updates</Text>
+              
+              <Image
+                source={{ uri: fetchedData.main_glow_picture_url }}
+                style={styles.modalImage}
+              />
+
+              <Text style={styles.modalProductName}>{fetchedData.name}</Text>
+              <Text style={styles.modalProductColor}>{fetchedData.color}</Text>
+              <Text style={styles.modalProductSize}>Size {selectedSize || 'UK 10'}</Text>
+            </View>
+          </View>
+       </Modal>
       </View>
     </View>
   </ScrollView>
@@ -254,7 +282,7 @@ const styles = StyleSheet.create({
   },
 
   sizeOptionSelected: {
-    backgroundColor: '#007bff',
+    backgroundColor:  '#007bff',
     color: '#fff',
   },
 
@@ -291,13 +319,18 @@ const styles = StyleSheet.create({
     marginRight: 8,
     marginLeft: 10,
     marginBottom: 20,
-    backgroundColor: '#007bff',
+    backgroundColor: '#2b2fff',
     justifyContent: 'center',
     alignItems: 'center',
     textAlign: 'center',
     fontSize: 16,
     color: '#fff',
     borderRadius: 8,
+  },
+
+  checkoutText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 
   disabledButton: {
@@ -316,6 +349,57 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     textAlign: 'center',
     fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dim the background
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  closeButtonText: {
+    fontSize: 18,
+    color: '#333',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 20,
+  },
+  modalImage: {
+    width: 200,
+    height: 150,
+    marginBottom: 20,
+  },
+  modalProductName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalProductColor: {
+    fontSize: 14,
+    color: '#888',
+    marginBottom: 10,
+  },
+  modalProductSize: {
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 });
 
