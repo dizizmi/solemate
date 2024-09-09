@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { StyleSheet, Image, Platform, ScrollView, View, Text, FlatList, ActivityIndicator, TouchableOpacity, Touchable} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { ThemedText } from '@/components/ThemedText';
 
 import axios from 'axios';
 import SearchBar from '@/components/SearchBar'
+
 
 type Search = {
   _id: string;
@@ -74,6 +76,7 @@ const SearchScreen: React.FC = () => {
             </View>
           </View>
         ))}
+        
       </ScrollView>
     );
 
@@ -104,7 +107,7 @@ const SearchScreen: React.FC = () => {
     navigation.navigate('Searches', { category });
     
   }
-  
+
 
   return (
    
@@ -113,29 +116,32 @@ const SearchScreen: React.FC = () => {
 
     {searchQuery === '' ? (
       <ScrollView>
+      <ThemedText type='subtitle' style={styles.recentSearches}>Recent searches</ThemedText>
+
+      <ThemedText type='subtitle' style={styles.recentSearches}>Suggested Keywords</ThemedText>
       <TouchableOpacity onPress={() => handleCategoryPress('Shop all')}>
-        <Text style={styles.text}>Shop all</Text>
+        <Text style={styles.text}>Nike Air Jordan 4</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => handleCategoryPress('Latest release')}>
-        <Text style={styles.text}>Latest release</Text>
+        <Text style={styles.text}>Carhatt X Converse</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => handleCategoryPress('Yeezy')}>
-        <Text style={styles.text}>Yeezy</Text>
+        <Text style={styles.text}>RAF Simmons X Adidas</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => handleCategoryPress('Adidas')}>
         <Text style={styles.text}>Adidas</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => handleCategoryPress('Jordan')}>
-        <Text style={styles.text}>Jordan</Text>
+        <Text style={styles.text}>MSCF Astro Boy</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => handleCategoryPress('Nike')}>
-        <Text style={styles.text}>Nike</Text>
+        <Text style={styles.text}>Travis Scott Mocha Dunk</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => handleCategoryPress('ASICS')}>
-        <Text style={styles.text}>ASICS</Text>
+        <Text style={styles.text}>OFF-White Jordans</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => handleCategoryPress('Apparels')}>
-        <Text style={styles.text}>Apparels</Text>
+        <Text style={styles.text}>Lightning McQueen Crocs</Text>
       </TouchableOpacity>
     </ScrollView>
     ) : (
@@ -179,7 +185,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     paddingVertical: 10,
-    margin: 10,
+    margin: 5,
     paddingLeft: 20
   },
   errorText: {
@@ -194,6 +200,12 @@ const styles = StyleSheet.create({
   productContainer: {
     padding: 2,
     
+  },
+
+  recentSearches: { 
+    margin: 20,
+    marginBottom: 10,
+
   },
   
   //Each product item
@@ -333,6 +345,35 @@ export default SearchScreen;
       ) : 
       ) 
       </View>
+
+      <TouchableOpacity onPress={() => handleCategoryPress('Latest release')}>
+        <Text style={styles.text}>Latest release</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => handleCategoryPress('Yeezy')}>
+        <Text style={styles.text}>Yeezy</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => handleCategoryPress('Adidas')}>
+        <Text style={styles.text}>Adidas</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => handleCategoryPress('Jordan')}>
+        <Text style={styles.text}>Jordan</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => handleCategoryPress('Nike')}>
+        <Text style={styles.text}>Nike</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => handleCategoryPress('ASICS')}>
+        <Text style={styles.text}>ASICS</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => handleCategoryPress('Apparels')}>
+        <Text style={styles.text}>Apparels</Text>
+      </TouchableOpacity>v
+
+        const handleCategoryPress = (category: string) => {
+    
+    navigation.navigate('Searches', { category });
+    
+  }
+  
     }*/
 
 
