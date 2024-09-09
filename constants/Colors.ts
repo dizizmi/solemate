@@ -24,3 +24,13 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
 };
+
+import { useFonts } from 'expo-font';
+
+export const useCustomFonts = () => {
+  const [fontsLoaded] = useFonts({
+    SpaceMono: require('../assets/fonts/SharpGrotesk-Book25.ttf'),
+  });
+
+  return fontsLoaded;
+};

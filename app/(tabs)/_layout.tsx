@@ -23,6 +23,7 @@ export default function TabLayout() {
           ),
         }}
       />
+    
       <Tabs.Screen
         name="explore"
         options={{
@@ -31,7 +32,19 @@ export default function TabLayout() {
             <TabBarIcon name={focused ? 'search' : 'search-outline'} color={color} />
           ),
         }}
+
       />
+
+      <Tabs.Screen
+          name="detail"
+          options={{ 
+            title: 'Detail',
+            tabBarIcon: ({ color, focused }) => (
+              <TabBarIcon name={focused ? 'expand' : 'expand-outline'} color={color} />
+            ),
+          }}
+      />
+      
       <Tabs.Screen
         name="ballot"
         options={{
@@ -59,6 +72,8 @@ export default function TabLayout() {
           ),
         }}
       />
+
+    
     </Tabs>
   );
 }

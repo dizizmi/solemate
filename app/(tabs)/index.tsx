@@ -95,11 +95,12 @@ const HomeScreen: React.FC = () => {
   const Products: React.FC<{ products: Latest[] }> = ({ products }) => (
     <ScrollView horizontal>
       {products.map((product) => (
-        <TouchableOpacity 
+        <TouchableOpacity
         //navigation to LatestRelease StockX shoes
           key = {product._id}
-          onPress={() => navigation.navigate('DetailedItem', { id: product._id})}
-        >
+          onPress={() => navigation.navigate('DetailedItem', { id: product._id })}
+      >
+        
           <View key={product._id} style={styles.card}>
             <Text style={styles.productBrand}>{product.releaseDate}</Text>
             <Image
